@@ -256,14 +256,17 @@ function render(){
  if(!ctx||!D)return;
  var w=cv._w,h=cv._h,i;
  var zi=Math.min(9,Math.floor((D.f-1)/10)),wc=WALLC[zi];
- ctx.fillStyle='#0b1226';ctx.fillRect(0,0,w,h/2);
- ctx.fillStyle='#161d33';ctx.fillRect(0,h/2,w,h/2);
+ var gc=ctx.createLinearGradient(0,0,0,h/2);gc.addColorStop(0,'#05070f');gc.addColorStop(1,'#141c36');
+ ctx.fillStyle=gc;ctx.fillRect(0,0,w,h/2);
+ var gf=ctx.createLinearGradient(0,h/2,0,h);gf.addColorStop(0,'#141c36');gf.addColorStop(1,'#232d4e');
+ ctx.fillStyle=gf;ctx.fillRect(0,h/2,w,h/2);
  var fov=Math.PI/3,zb=[];
- for(i=0;i<w;i+=2){
+ for(i=0;i<w;i++){
   var a=D.pa-fov/2+fov*i/w,rr=cast(a),dist=Math.max(.05,rr.d*Math.cos(a-D.pa));
-  var lh=Math.min(h*3,h/dist);zb[i]=dist;
-  var sd=Math.max(.25,Math.min(1,1.25/dist))*(rr.side?.72:1);
-  ctx.fillStyle=shade(wc,sd);ctx.fillRect(i,(h-lh)/2,2,lh)}
+  var lh=Math.min(h*4,h/dist);zb[i]=dist;
+  var sd=Math.max(.18,Math.min(1,1.25/dist))*(rr.side?.7:1);
+  var tx=rr.wx,edge=(tx<.035||tx>.965)?.66:1,band=(Math.floor(tx*4)%2)?.92:1;
+  ctx.fillStyle=shade(wc,sd*edge*band);ctx.fillRect(i,(h-lh)/2,1,lh)}
  var sp=[];
  for(i=0;i<D.ents.length;i++){var e=D.ents[i];
   if(e.t==='mon'&&!e.alive)continue;if(e.t==='chest'&&e.open)continue;
@@ -276,16 +279,18 @@ function render(){
  drawMini()}
 
 function cast(a){
- var sinA=Math.sin(a),cosA=Math.cos(a),x=D.px,y=D.py,d=0,side=false;
- for(var s=0;s<260;s++){d+=.04;var nx=x+cosA*d,ny=y+sinA*d;
-  if(wall(nx,ny)){side=Math.abs(nx-Math.round(nx))>Math.abs(ny-Math.round(ny));return {d:d,side:side}}}
- return {d:12,side:false}}
+ var sinA=Math.sin(a),cosA=Math.cos(a),x=D.px,y=D.py,d=0;
+ for(var s=0;s<440;s++){d+=.024;var nx=x+cosA*d,ny=y+sinA*d;
+  if(wall(nx,ny)){var fx=nx-Math.floor(nx),fy=ny-Math.floor(ny);
+   var side=Math.min(fx,1-fx)<Math.min(fy,1-fy);
+   return {d:d,side:side,wx:side?fy:fx}}}
+ return {d:12,side:false,wx:0}}
 function shade(hex,k){var n=parseInt(hex.slice(1),16);
  return 'rgb('+Math.round((n>>16&255)*k)+','+Math.round((n>>8&255)*k)+','+Math.round((n&255)*k)+')'}
 
 function drawSprite(s,w,h,fov,zb){
  var sx=w/2+(s.a/fov)*w,sz=Math.min(h*1.6,h/Math.max(.3,s.d))*0.66;
- var col=Math.floor(sx/2)*2;if(col<0)col=0;if(col>=w)col=w-2;
+ var col=Math.round(sx);if(col<0)col=0;if(col>=w)col=w-1;
  if(zb[col]!==undefined&&zb[col]<s.d-.25)return;
  var cy=h/2+sz*0.22,k=Math.max(.35,Math.min(1,1.3/s.d));
  if(s.e.t==='mon'){
