@@ -22,10 +22,12 @@
 .btn.gold{background:#a8791a}
 .btn:active{transform:translateY(1px)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.ans{border:2px solid #3d57a8;background:#1d2b5c;border-radius:12px;padding:20px 4px;font-size:26px;color:#fff;font-family:inherit;cursor:pointer}
+.ans{border:2px solid #3d57a8;background:#1d2b5c;border-radius:12px;padding:18px 6px;font-size:26px;color:#fff;font-family:inherit;cursor:pointer;word-break:break-word;line-height:1.3;min-height:64px}
+.ans.med{font-size:19px;padding:15px 8px;line-height:1.4}
+.ans.small{font-size:15px;padding:12px 8px;line-height:1.45}
 .ans.ok{background:#14684a;border-color:#3fd69a}
 .ans.ng{background:#6d1b2c;border-color:#e0607a}
-.hud{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#9fb3e6}
+.hud{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#9fb3e6;gap:8px}
 .bar{height:9px;background:#22305e;border-radius:6px;overflow:hidden;margin-top:6px}
 .bar>i{display:block;height:100%;background:#e05a7a;transition:width .25s}
 .q{font-size:32px;text-align:center;margin:14px 0 4px;letter-spacing:1px}
@@ -56,12 +58,38 @@
 <div id="game"></div>
 <script>
 (function(){
+var KJ=[
+['山|やま','川|かわ','花|はな','犬|いぬ','空|そら','学校|がっこう','先生|せんせい','元気|げんき','毎日|まいにち','友人|ゆうじん','昼食|ちゅうしょく','雪国|ゆきぐに'],
+['委員|いいん','病院|びょういん','水泳|すいえい','温度|おんど','世界|せかい','階段|かいだん','感想|かんそう','漢字|かんじ','図書館|としょかん','海岸|かいがん','中央|ちゅうおう','屋根|やね'],
+['愛情|あいじょう','英語|えいご','栄養|えいよう','加熱|かねつ','結果|けっか','機械|きかい','被害|ひがい','改良|かいりょう','億万|おくまん','衣服|いふく','印刷|いんさつ','位置|いち'],
+['圧力|あつりょく','移動|いどう','原因|げんいん','永遠|えいえん','経営|けいえい','衛星|えいせい','利益|りえき','液体|えきたい','演技|えんぎ','応援|おうえん','価格|かかく','河川|かせん'],
+['異常|いじょう','地域|ちいき','宇宙|うちゅう','映画|えいが','延長|えんちょう','拡大|かくだい','改革|かいかく','内閣|ないかく','株式|かぶしき','危険|きけん','簡単|かんたん','机上|きじょう']
+];
+var HANTAI='おおきい|ちいさい,たかい|ひくい,あつい|さむい,はやい|おそい,ながい|みじかい,あかるい|くらい,おもい|かるい,つよい|よわい,ひろい|せまい,あたらしい|ふるい,おおい|すくない,ふかい|あさい,とおい|ちかい,うれしい|かなしい,かたい|やわらかい,安全|危険,成功|失敗,出発|到着,原因|結果,生産|消費'.split(',');
+var IMI='あんぜん|あぶなくないこと,しんせつ|人にやさしくすること,がまん|つらいのをこらえること,じゅんび|前もって用意すること,そうだん|人に聞いて決めること,かんしゃ|ありがたいと思うこと,しゅうちゅう|ひとつのことに気持ちを向けること,ていねい|こまかいところまで気をつけること,せいけつ|よごれがなくきれいなこと,ゆうき|こわくても前に出る気持ち,せきにん|自分がやると引き受けること,きょうりょく|力を合わせること,かいけつ|問題をなくすこと,はんだん|どちらかを決めること,そうぞう|頭の中で思いえがくこと'.split(',');
+var NITA='うつくしい|きれい,たいせつ|だいじ,すぐに|ただちに,ときどき|たまに,ぜんぶ|すべて,かんたん|やさしい,りゆう|わけ,方法|やり方,努力|がんばること,進歩|上達,興味|関心,予想|見こみ,不安|心配,永遠|いつまでも,豊富|たくさん'.split(',');
+var KOTOWAZA='犬も歩けば棒に当たる|出歩くと思いがけないことに出会う,さるも木から落ちる|じょうずな人でも失敗する,ちりも積もれば山となる|小さなことも続ければ大きくなる,急がば回れ|急ぐときほど安全な道を行くほうが早い,石の上にも三年|がまんして続ければいつか実る,百聞は一見にしかず|聞くより一度見るほうがよく分かる,のれんに腕おし|やってもてごたえがない,転ばぬ先のつえ|失敗する前に用意しておく,二兎を追う者は一兎をも得ず|欲ばると両方とも失う,好きこそものの上手なれ|好きなことは上達が早い,雨降って地固まる|もめたあとかえってよくなる,三日ぼうず|すぐにあきてやめてしまう,馬の耳に念仏|言っても聞いていない,たなからぼたもち|思いがけない幸運,身から出たさび|自分のせいで苦しむ'.split(',');
+var NARABE='ぼくは|水を|のんだ,母が|花を|かった,犬が|庭で|ねている,わたしは|本を|よんだ,弟が|絵を|かいた,風が|つよく|ふいた,父は|車を|あらった,ねこが|魚を|たべた,先生が|黒板に|書いた,鳥が|空を|とんだ,姉は|ピアノを|ひいた,雨が|やねを|たたいた'.split(',');
+var JUKUGO='上下|反対の意味の字,強弱|反対の意味の字,明暗|反対の意味の字,増減|反対の意味の字,思考|にた意味の字,道路|にた意味の字,岩石|にた意味の字,寒冷|にた意味の字,急行|上が下をくわしくする,黒板|上が下をくわしくする,読書|下が上の目的になる,登山|下が上の目的になる'.split(',');
+var KEIGO='言う（先生が）|おっしゃる,行く（自分が）|うかがう,食べる（お客さまが）|めしあがる,見る（自分が）|拝見する,する（先生が）|なさる,もらう（自分が）|いただく,来る（お客さまが）|いらっしゃる,聞く（自分が）|うかがう,いる（先生が）|いらっしゃる,あげる（自分が）|さしあげる'.split(',');
+
+var EW1='いぬ|dog,ねこ|cat,とり|bird,さかな|fish,うま|horse,ぞう|elephant,あか|red,あお|blue,みどり|green,きいろ|yellow,しろ|white,くろ|black,1|one,2|two,3|three,4|four,5|five,6|six,7|seven,8|eight'.split(',');
+var EW2='りんご|apple,ほん|book,つくえ|desk,いす|chair,がっこう|school,せんせい|teacher,ともだち|friend,いえ|house,みず|water,ぎゅうにゅう|milk,パン|bread,たまご|egg,あたま|head,て|hand,あし|foot,め|eye,はは|mother,ちち|father,あね|sister,あに|brother'.split(',');
+var EW3='はしる|run,およぐ|swim,たべる|eat,のむ|drink,よむ|read,かく|write,あるく|walk,ねむる|sleep,あそぶ|play,うたう|sing,はる|spring,なつ|summer,あき|autumn,ふゆ|winter,あさ|morning,よる|night,きょう|today,あした|tomorrow,やま|mountain,うみ|sea'.split(',');
+var EBUN='わたしは学生です|I am a student,これはペンです|This is a pen,かれは先生です|He is a teacher,わたしは犬がすきです|I like dogs,あれは学校です|That is a school,かのじょは歌います|She sings,わたしたちは友だちです|We are friends,それは本です|It is a book,かれらは走ります|They run,わたしは毎日読みます|I read every day,あなたはやさしいです|You are kind,ねこはテーブルの上にいます|The cat is on the table'.split(',');
+var EFUKU='book|books,box|boxes,city|cities,child|children,foot|feet,man|men,tooth|teeth,leaf|leaves,knife|knives,bus|buses,baby|babies,mouse|mice'.split(',');
+var EKAKO='go|went,eat|ate,see|saw,come|came,make|made,take|took,give|gave,run|ran,write|wrote,sing|sang,buy|bought,teach|taught'.split(',');
+var EZEN='つくえの上に|on the desk,はこの中に|in the box,いすの下に|under the chair,ドアのそばに|by the door,学校へ|to school,ともだちと|with my friend,7時に|at seven,日曜日に|on Sunday,朝に|in the morning,かべに|on the wall,木のうしろに|behind the tree,2つの間に|between the two'.split(',');
+var EKIMARI='ありがとう|Thank you,はじめまして|Nice to meet you,おはよう|Good morning,ごめんなさい|I am sorry,お元気ですか|How are you,いくつですか|How old are you,これは何ですか|What is this,どこですか|Where is it,いくらですか|How much is it,もう一度お願いします|Pardon me,いってきます|See you later,たすけて|Help me'.split(',');
+
 var G=document.getElementById('game');
 var ZONES=[[1,10,'1年生の森'],[11,20,'2年生の谷'],[21,30,'3年生の橋'],[31,40,'4年生のどうくつ'],[41,50,'5年生のみずうみ'],[51,60,'6年生の山'],[61,70,'中学の門'],[71,80,'高校のとう'],[81,90,'東大のとびら'],[91,100,'スタンフォードの空']];
 var OPEN=40;
 var GEAR=['きのぼう','ひかるぼうし','かぜのマント','いなずまのつえ','りゅうのたて','ほしのかんむり','じかんのとけい','ちしきのつるぎ'];
 var FOE=['スライムン','コケゴン','カゼバネ','イワゴロ','ミズタマ','ホノオネコ','カミナリウサギ','カゲオオカミ','ヒカリドラゴン','ソラノヌシ'];
 var WALLC=['#2c6b57','#3d6b2c','#2c4f6b','#5a5a52','#2c6b6b','#6b4a2c','#6b5f2c','#4a2c6b','#6b2c47','#4a4a6b'];
+var SUBJ=['算数','国語','英語'];
+var SUBJC=['#1d7a53','#8a4a2c','#2b4cb0'];
 var S=null,slot=0,snd=true;
 
 function r(a,b){return Math.floor(Math.random()*(b-a+1))+a}
@@ -78,6 +106,18 @@ function atk(){return 2+S.gear.length+(S.ab||0)}
 function zoneOf(f){for(var i=0;i<ZONES.length;i++)if(f<=ZONES[i][1])return ZONES[i];return ZONES[9]}
 function foeName(f){return FOE[Math.min(9,Math.floor((f-1)/10))]}
 
+function subjOf(f){return (f-1)%3}
+function subjName(f){return SUBJ[subjOf(f)]}
+function stageOf(f){return Math.floor((f-1)/3)+1}
+function subjTag(f){return '<span style="background:'+SUBJC[subjOf(f)]+';border-radius:999px;padding:2px 9px;font-size:12px;color:#fff">'+subjName(f)+'</span>'}
+
+function P(a){return a.map(function(x){return x.split('|')})}
+function pick4(ans,pool){var s={},o=[ans];s[ans]=1;
+ var p=pool.slice();sh(p);
+ for(var i=0;i<p.length&&o.length<4;i++){if(!s[p[i]]){s[p[i]]=1;o.push(p[i])}}
+ var n=1;while(o.length<4){var v='？'+n;if(!s[v]){s[v]=1;o.push(v)}n++}
+ return sh(o)}
+
 function fr(n,d){return n+'/'+d}
 function mkCh(ans,kind,cx){var s={},o=[ans];s[ans]=1;
  for(var g=0;g<120&&o.length<4;g++){var v=null;
@@ -88,7 +128,7 @@ function mkCh(ans,kind,cx){var s={},o=[ans];s[ans]=1;
  var k=2;while(o.length<4){var f2=String(parseInt(ans,10)+k*7);if(!s[f2]){s[f2]=1;o.push(f2)}k++}
  return sh(o)}
 
-function makeQ(f){var a,b,c,t,ans,kind='int',cx=null,lg=false;
+function mathQ(f){var a,b,c,t,ans,kind='int',cx=null,lg=false;
  if(f<=3){if(r(0,1)){a=r(1,8);b=r(1,9-a);t=a+' + '+b;ans=a+b}else{a=r(3,10);b=r(1,a-1);t=a+' - '+b;ans=a-b}}
  else if(f<=6){if(r(0,1)){a=r(5,9);b=r(11-a,9);t=a+' + '+b;ans=a+b}else{a=r(11,18);b=r(a-9,9);t=a+' - '+b;ans=a-b}}
  else if(f<=10){a=r(2,9);b=r(2,9);t=a+' × '+b;ans=a*b}
@@ -98,14 +138,78 @@ function makeQ(f){var a,b,c,t,ans,kind='int',cx=null,lg=false;
  else if(f<=26){if(r(0,1)){a=r(20,80);c=a+r(12,90);t=a+' + □ = '+c;ans=c-a}else{a=r(101,499);b=r(101,499);t=a+' + '+b;ans=a+b}}
  else if(f<=30){kind='dec';a=r(1,9);b=r(1,9);if(r(0,1)){t=(a/10).toFixed(1)+' + '+(b/10).toFixed(1);ans=((a+b)/10).toFixed(1)}else{if(a<b){var tp=a;a=b;b=tp}t=(a/10).toFixed(1)+' - '+(b/10).toFixed(1);ans=((a-b)/10).toFixed(1)}}
  else if(f<=34){kind='frac';var d=r(4,9);a=r(1,d-2);b=r(1,d-a-1);if(b<1)b=1;t=fr(a,d)+' + '+fr(b,d);ans=fr(a+b,d);cx={n:a+b,d:d}}
- else{lg=true;var k=r(1,5);
-  if(k===1){a=r(3,9);b=r(2,6);t='時速 '+a+'km で '+b+'時間 あるくと、なんkm すすむ？';ans=a*b}
-  else if(k===2){a=r(40,90);b=r(3,8);t='1こ '+a+'円 の あめを '+b+'こ かうと、いくら？';ans=a*b}
-  else if(k===3){b=r(3,8);c=r(4,12);t=(b*c)+'この あめを '+b+'人で 同じ数ずつ わけると、1人ぶんは なんこ？';ans=c}
-  else if(k===4){a=r(2,9)*100;b=r(1,4)*10;t=a+'円 の '+b+'% は いくら？';ans=a*b/100}
+ else{lg=true;var kk=r(1,5);
+  if(kk===1){a=r(3,9);b=r(2,6);t='時速 '+a+'km で '+b+'時間 あるくと、なんkm すすむ？';ans=a*b}
+  else if(kk===2){a=r(40,90);b=r(3,8);t='1こ '+a+'円 の あめを '+b+'こ かうと、いくら？';ans=a*b}
+  else if(kk===3){b=r(3,8);c=r(4,12);t=(b*c)+'この あめを '+b+'人で 同じ数ずつ わけると、1人ぶんは なんこ？';ans=c}
+  else if(kk===4){a=r(2,9)*100;b=r(1,4)*10;t=a+'円 の '+b+'% は いくら？';ans=a*b/100}
   else{b=r(3,6);c=r(3,9);t='全体の 1/'+b+' が '+c+'こ です。全体は なんこ？';ans=b*c}}
  ans=String(ans);
- return {t:t,ans:ans,ch:mkCh(ans,kind,cx),long:lg}}
+ return {t:t,ans:ans,ch:mkCh(ans,kind,cx),long:lg,eq:!lg}}
+
+function kanjiQ(gi){var g=P(KJ[gi]),i=r(0,g.length-1);
+ return {t:'「'+g[i][0]+'」 の よみかたは？',ans:g[i][1],ch:pick4(g[i][1],g.map(function(x){return x[1]}))}}
+function imiQ(){var m=P(IMI),i=r(0,m.length-1);
+ return {t:'「'+m[i][0]+'」 の いみは？',ans:m[i][1],ch:pick4(m[i][1],m.map(function(x){return x[1]})),long:true}}
+function hantaiQ(){var m=P(HANTAI),i=r(0,m.length-1),fl=r(0,1);
+ var a=fl?m[i][1]:m[i][0],b=fl?m[i][0]:m[i][1],pool=[];
+ m.forEach(function(x){pool.push(x[0]);pool.push(x[1])});
+ return {t:'「'+a+'」 の はんたいは？',ans:b,ch:pick4(b,pool.filter(function(v){return v!==a&&v!==b}))}}
+function nitaQ(){var m=P(NITA),i=r(0,m.length-1);
+ return {t:'「'+m[i][0]+'」 と にた いみの ことばは？',ans:m[i][1],ch:pick4(m[i][1],m.map(function(x){return x[1]}))}}
+function kotowazaQ(){var m=P(KOTOWAZA),i=r(0,m.length-1);
+ return {t:'「'+m[i][0]+'」 の いみは？',ans:m[i][1],ch:pick4(m[i][1],m.map(function(x){return x[1]})),long:true}}
+function narabeQ(){var m=NARABE.map(function(x){return x.split('|')}),i=r(0,m.length-1),p=m[i];
+ var right=p.join(' ');
+ var pm=[[0,2,1],[1,0,2],[2,1,0],[1,2,0],[2,0,1]];sh(pm);
+ var o=[right];
+ for(var j=0;j<pm.length&&o.length<4;j++){var v=pm[j].map(function(x){return p[x]}).join(' ');if(o.indexOf(v)<0)o.push(v)}
+ return {t:'ただしい じゅんばんは？　（'+sh(p.slice()).join('／')+'）',ans:right,ch:sh(o),long:true}}
+function jukugoQ(){var m=P(JUKUGO),i=r(0,m.length-1);
+ return {t:'じゅくご「'+m[i][0]+'」 の 組み立ては？',ans:m[i][1],ch:sh(['反対の意味の字','にた意味の字','上が下をくわしくする','下が上の目的になる']),long:true}}
+function keigoQ(){var m=P(KEIGO),i=r(0,m.length-1);
+ return {t:'「'+m[i][0]+'」 の ていねいな 言い方は？',ans:m[i][1],ch:pick4(m[i][1],m.map(function(x){return x[1]}))}}
+
+function kokugoQ(k){
+ if(k<=2)return r(0,1)?imiQ():kanjiQ(0);
+ if(k<=4)return r(0,1)?kanjiQ(0):hantaiQ();
+ if(k<=6)return r(0,1)?kanjiQ(1):hantaiQ();
+ if(k<=8)return r(0,1)?kanjiQ(2):kotowazaQ();
+ if(k<=10)return r(0,1)?kanjiQ(3):nitaQ();
+ if(k<=12)return r(0,1)?kanjiQ(4):narabeQ();
+ return r(0,1)?jukugoQ():keigoQ()}
+
+function alphaQ(){var A='ABCDEFGHIJKLMNOPQRSTUVWXYZ',i=r(0,25),c=A.charAt(i),pool=[];
+ for(var j=0;j<26;j++)pool.push(A.charAt(j).toLowerCase());
+ return {t:'大文字「'+c+'」 の 小文字は？',ans:c.toLowerCase(),ch:pick4(c.toLowerCase(),pool)}}
+function phonicsQ(){var m=P(EW1.concat(EW2)),i=r(0,m.length-1),w=m[i][1],c=w.charAt(0);
+ var others=m.filter(function(x){return x[1].charAt(0)!==c}).map(function(x){return x[1]});
+ return {t:'「'+c+'」 で はじまる ことばは？',ans:w,ch:pick4(w,others)}}
+function ewQ(list,rev){var m=P(list),i=r(0,m.length-1);
+ if(rev)return {t:'「'+m[i][1]+'」 は 日本語で？',ans:m[i][0],ch:pick4(m[i][0],m.map(function(x){return x[0]}))};
+ return {t:'「'+m[i][0]+'」 は 英語で？',ans:m[i][1],ch:pick4(m[i][1],m.map(function(x){return x[1]}))}}
+function ebunQ(list){var m=P(list),i=r(0,m.length-1);
+ return {t:'「'+m[i][0]+'」 を 英語で？',ans:m[i][1],ch:pick4(m[i][1],m.map(function(x){return x[1]})),long:true}}
+function efukuQ(){var m=P(EFUKU),i=r(0,m.length-1);
+ return {t:'「'+m[i][0]+'」 の ふくすうけいは？',ans:m[i][1],ch:pick4(m[i][1],m.map(function(x){return x[1]}))}}
+function ekakoQ(){var m=P(EKAKO),i=r(0,m.length-1);
+ return {t:'「'+m[i][0]+'」 の かこけいは？',ans:m[i][1],ch:pick4(m[i][1],m.map(function(x){return x[1]}))}}
+function beQ(){var s=[['I','am'],['You','are'],['He','is'],['She','is'],['We','are'],['They','are'],['It','is'],['Tom','is']],i=r(0,s.length-1);
+ return {t:s[i][0]+' ___ happy.　の ___ に 入るのは？',ans:s[i][1],ch:sh(['am','are','is','be']),long:true}}
+
+function eigoQ(k){
+ if(k<=2)return r(0,1)?alphaQ():phonicsQ();
+ if(k<=4)return ewQ(EW1,r(0,1));
+ if(k<=6)return ewQ(EW2,r(0,1));
+ if(k<=8)return r(0,1)?ewQ(EW3,r(0,1)):ebunQ(EBUN);
+ if(k<=10)return r(0,1)?efukuQ():beQ();
+ if(k<=12)return r(0,1)?ekakoQ():ebunQ(EBUN);
+ return r(0,1)?ebunQ(EZEN):ebunQ(EKIMARI)}
+
+function makeQ(f){var s=subjOf(f),k=stageOf(f);
+ if(s===0)return mathQ(Math.max(1,Math.min(40,Math.round(k*40/14))));
+ if(s===1)return kokugoQ(k);
+ return eigoQ(k)}
 
 var LOOT=[
  {w:34,k:'gold',n:'きんか',d:function(){var g=r(3,12);S.gold+=g;return g+' まい'}},
@@ -160,14 +264,15 @@ function wall(x,y){if(x<0||y<0||x>=D.w||y>=D.h)return true;return D.m[Math.floor
 function entAt(x,y){for(var i=0;i<D.ents.length;i++){var e=D.ents[i];if(e.x===x&&e.y===y){if(e.t==='mon'&&!e.alive)continue;if(e.t==='chest'&&e.open)continue;return e}}return null}
 
 function screenTitle(){
- G.innerHTML='<div class="c" style="padding:24px 0 6px"><div style="font-size:13px;color:#9fb3e6;letter-spacing:3px">100かいだての</div><div style="font-size:42px;font-weight:500;letter-spacing:2px;margin:4px 0">かしこの塔</div><div class="sm">てっぺんは、東大とスタンフォード</div></div>'
- +'<div class="c" style="margin:14px 0">'+foeSvg(1,false)+'</div>'
+ G.innerHTML='<div class="c" style="padding:22px 0 6px"><div style="font-size:13px;color:#9fb3e6;letter-spacing:3px">100かいだての</div><div style="font-size:42px;font-weight:500;letter-spacing:2px;margin:4px 0">かしこの塔</div><div class="sm">てっぺんは、東大とスタンフォード</div></div>'
+ +'<div class="c" style="margin:12px 0">'+foeSvg(1,false)+'</div>'
+ +'<div class="c" style="margin:6px 0 2px">'+subjTag(1)+' '+subjTag(2)+' '+subjTag(3)+'</div>'
  +'<button class="btn" id="go">はじめる</button>'
- +'<div class="sm c" style="margin-top:14px">ダンジョンを あるいて、まものを たおす。<br>たおすたびに たからばこが もらえる。</div>';
+ +'<div class="sm c" style="margin-top:14px">ダンジョンを あるいて、まものを たおす。<br>階ごとに 算数・国語・英語 が かわる。</div>';
  document.getElementById('go').onclick=screenSlots}
 
 function foeSvg(f,hurt){var i=Math.min(9,Math.floor((f-1)/10));var col=['#5dcaa5','#97c459','#85b7eb','#b4b2a9','#5dcaa5','#ef9f27','#ffd24a','#af7fdd','#f0997b','#ffffff'][i];var y=hurt?6:0;
- return '<svg viewBox="0 0 120 100" width="150" height="125" aria-hidden="true"><ellipse cx="60" cy="92" rx="34" ry="6" fill="#0a1029"/><g transform="translate(0,'+y+')"><path d="M22 76 Q18 30 60 26 Q102 30 98 76 Z" fill="'+col+'"/><circle cx="46" cy="54" r="7" fill="#101a3a"/><circle cx="74" cy="54" r="7" fill="#101a3a"/><circle cx="48" cy="52" r="2.4" fill="#fff"/><circle cx="76" cy="52" r="2.4" fill="#fff"/><path d="M50 68 Q60 '+(hurt?60:76)+' 70 68" stroke="#101a3a" stroke-width="3" fill="none" stroke-linecap="round"/></g></svg>'}
+ return '<svg viewBox="0 0 120 100" width="140" height="117" aria-hidden="true"><ellipse cx="60" cy="92" rx="34" ry="6" fill="#0a1029"/><g transform="translate(0,'+y+')"><path d="M22 76 Q18 30 60 26 Q102 30 98 76 Z" fill="'+col+'"/><circle cx="46" cy="54" r="7" fill="#101a3a"/><circle cx="74" cy="54" r="7" fill="#101a3a"/><circle cx="48" cy="52" r="2.4" fill="#fff"/><circle cx="76" cy="52" r="2.4" fill="#fff"/><path d="M50 68 Q60 '+(hurt?60:76)+' 70 68" stroke="#101a3a" stroke-width="3" fill="none" stroke-linecap="round"/></g></svg>'}
 
 function screenSlots(){var a=load();var h='<div class="big c" style="margin:10px 0 14px">だれが のぼる？</div>';
  for(var i=0;i<2;i++){var s=a[i];
@@ -187,10 +292,12 @@ function checkDay(){var t=today();if(S.last!==t){var d1=new Date(S.last),d2=new 
 
 function screenMap(){
  var h='<div class="hud"><span>'+S.name+'　Lv'+S.lv+'</span><span>'+S.days+'日 れんぞく　きんか '+S.gold+'</span></div>';
- h+='<div class="big c" style="margin:12px 0 10px">いま '+S.floor+' かい</div>';
+ h+='<div class="big c" style="margin:12px 0 4px">いま '+S.floor+' かい</div>';
+ h+='<div class="c" style="margin-bottom:10px">'+subjTag(S.floor)+'</div>';
  for(var i=ZONES.length-1;i>=0;i--){var z=ZONES[i];var now=S.floor>=z[0]&&S.floor<=z[1];var lock=z[0]>OPEN;
   h+='<div class="zone'+(now?' now':'')+(lock?' locked':'')+'"><b>'+z[0]+'-'+z[1]+'</b> '+z[2]+(now?'　← いまここ':(lock?'　（とじている）':''))+'</div>'}
- h+='<button class="btn" id="up">'+S.floor+'かいに のぼる</button>';
+ h+='<button class="btn" id="up">'+S.floor+'かいに のぼる（'+subjName(S.floor)+'）</button>';
+ h+='<div class="sm c" style="margin-top:10px">階ごとに 算数 → 国語 → 英語 の じゅんで かわります</div>';
  h+='<div class="sm c" style="margin-top:12px">べつの階から はじめる（学年でとめない）</div><div class="lv">'
    +'<button data-f="1">1かい</button><button data-f="11">11かい</button><button data-f="21">21かい</button><button data-f="31">31かい</button></div>';
  h+='<div class="sm c" style="margin-top:12px">こうげき '+atk()+'　♥ '+maxhp()+'　さいこう '+S.max+'かい</div>';
@@ -211,7 +318,7 @@ function enterFloor(f){if(f>OPEN)return screenGate();buildFloor(f);drawDungeon()
 function drawDungeon(){
  var z=zoneOf(D.f);
  var hearts='';for(var i=0;i<maxhp();i++)hearts+=(i<S.hp?'<span style="color:#e0607a">♥</span>':'<span style="color:#3a4a7a">♥</span>');
- var h='<div class="hud"><span>'+D.f+'かい　'+z[2]+'</span><span>'+hearts+'</span></div>';
+ var h='<div class="hud"><span>'+D.f+'かい　'+subjTag(D.f)+'　'+z[2]+'</span><span>'+hearts+'</span></div>';
  h+='<div class="view"><canvas id="cv"></canvas><canvas id="mc" class="mini"></canvas></div>';
  h+='<div class="sm c" style="margin-top:8px">'+(D.left>0?('まもの のこり '+D.left+'たい　→ たおすと かいだんが ひらく'):'かいだんが ひらいた！ さがそう')+'</div>';
  h+='<div class="pad"><button id="l">← ひだり</button><button id="f">すすむ</button><button id="rt">みぎ →</button></div>';
@@ -243,7 +350,7 @@ function step(){if(anim)return;
   var e=entAt(nx,ny);
   if(e&&e.t==='mon')return startBattle(e);
   if(e&&e.t==='chest'){e.open=true;return screenChest(1,'たからばこを みつけた！',function(){drawDungeon()})}
-  if(e&&e.t==='stair'){if(D.left>0){toast('かいだんは しまっている。まもの のこり '+D.left+'たい');}else return clearFloor()}})}
+  if(e&&e.t==='stair'){if(D.left>0){toast('かいだんは しまっている。まもの のこり '+D.left+'たい')}else return clearFloor()}})}
 function bump(){if(!cv)return;cv.style.transform='translateX(-5px)';setTimeout(function(){cv.style.transform=''},120)}
 function toast(m){var el=document.querySelector('.view');if(!el)return;var d=document.createElement('div');d.textContent=m;d.style.cssText='position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:13px;color:#ffd24a;background:rgba(10,16,41,.8);padding:6px';el.appendChild(d);setTimeout(function(){d.remove()},1600)}
 function ease(t){return t<.5?2*t*t:-1+(4-2*t)*t}
@@ -334,13 +441,15 @@ function startBattle(e){document.onkeydown=null;
 function drawBattle(fx){
  var z=zoneOf(B.f);
  var hearts='';for(var i=0;i<maxhp();i++)hearts+=(i<S.hp?'<span style="color:#e0607a">♥</span>':'<span style="color:#3a4a7a">♥</span>');
- var h='<div class="hud"><span>'+B.f+'かい　'+z[2]+'</span><span>'+hearts+'</span></div>';
+ var h='<div class="hud"><span>'+B.f+'かい　'+subjTag(B.f)+'</span><span>'+hearts+'</span></div>';
  h+='<div class="sm" style="margin-top:10px">'+(B.boss?'ボス ':'')+foeName(B.f)+'</div><div class="bar"><i style="width:'+(B.fhp/B.fmax*100)+'%"></i></div>';
  h+='<div class="reward">たおすと：たからばこ '+(B.boss?'2つ ＋ そうび':'1つ')+'</div>';
  h+='<div class="c '+(fx==='hit'?'pop':(fx==='miss'?'shake':''))+'" style="margin:2px 0">'+foeSvg(B.f,fx==='hit')+'</div>';
  h+='<div class="combo">'+(B.combo>=3?'かいしんの いちげき！　'+B.combo+'れんぞく':(B.combo===2?'あと1つで かいしん':''))+'</div>';
- h+='<div class="q'+(B.q.long?' long':'')+'">'+B.q.t+(B.q.long?'':' = ?')+'</div>';
- h+='<div class="grid">'+B.q.ch.map(function(v){return '<button class="ans" data-v="'+v+'">'+v+'</button>'}).join('')+'</div>';
+ h+='<div class="q'+(B.q.long?' long':'')+'">'+B.q.t+(B.q.eq?' = ?':'')+'</div>';
+ var lm=0;B.q.ch.forEach(function(v){lm=Math.max(lm,String(v).length)});
+ var sz=lm<=6?'':(lm<=12?' med':' small');
+ h+='<div class="grid">'+B.q.ch.map(function(v){return '<button class="ans'+sz+'" data-v="'+String(v).replace(/"/g,'&quot;')+'">'+v+'</button>'}).join('')+'</div>';
  h+='<button class="btn sub" id="run">にげる</button>';
  G.innerHTML=h;
  G.querySelectorAll('.ans').forEach(function(b){b.onclick=function(){answer(b.dataset.v,b)}});
@@ -352,8 +461,8 @@ function answer(v,el){
   B.fhp-=atk()*(B.combo>=3?2:1);
   setTimeout(function(){if(B.fhp<=0)return winBattle();B.q=makeQ(B.f);drawBattle('hit')},280)}
  else{el.className='ans ng';beep(160,.18,'sawtooth');B.combo=0;S.hp--;
-  var t=G.querySelector('.q');if(t)t.innerHTML=B.q.t+(B.q.long?'':' = ')+'<span style="color:#ffd24a">'+B.q.ans+'</span>';
-  setTimeout(function(){if(S.hp<=0)return lose();B.q=makeQ(B.f);drawBattle('miss')},1300)}}
+  var t=G.querySelector('.q');if(t)t.innerHTML=B.q.t+(B.q.eq?' = ':'　→ ')+'<span style="color:#ffd24a">'+B.q.ans+'</span>';
+  setTimeout(function(){if(S.hp<=0)return lose();B.q=makeQ(B.f);drawBattle('miss')},1500)}}
 
 function lose(){
  G.innerHTML='<div class="c" style="padding:26px 0"><div class="big">にげかえった</div><div class="sm" style="margin-top:10px">'+B.f+'かいの まもの は つよかった。<br>たおした まもの と そうび は きえない。</div></div><button class="btn" id="re">'+B.f+'かいの 入口から</button><button class="btn sub" id="bk">地図に もどる</button>';
@@ -372,14 +481,13 @@ function winBattle(){
  save();
  screenChest(n,foeName(B.f)+' を たおした！'+(gearGot?'　そうび「'+gearGot+'」！':''),function(){
   if(extra)return levelUpScreen(extra);
-  afterBattle()},extra)}
+  afterBattle()})}
 
 function levelUpScreen(msg){
  G.innerHTML='<div class="c" style="padding:40px 0"><div class="big" style="color:#ffd24a">'+msg+'</div></div><button class="btn" id="g">つづける</button>';
  document.getElementById('g').onclick=afterBattle}
 
-function afterBattle(){if(D.left<=0)toastNext();drawDungeon();if(D.left<=0)setTimeout(function(){toast('かいだんが ひらいた！')},60)}
-function toastNext(){}
+function afterBattle(){var op=(D.left<=0);drawDungeon();if(op)setTimeout(function(){toast('かいだんが ひらいた！')},60)}
 
 function screenChest(n,title,done){
  var got=[],i;for(i=0;i<n;i++)got.push(rollLoot());
@@ -400,7 +508,8 @@ function clearFloor(){
  screenChest(1,D.f+'かい クリア！　かいだんを のぼった',function(){
   var nb=(nf%5===0);
   var h='<div class="c" style="padding:18px 0 4px"><div class="big">つぎは '+nf+' かい</div>';
-  h+='<div class="sm" style="margin-top:10px">'+(nf>OPEN?'…かたい とびらが ある':(nb?'★ボスが まっている（たからばこ 2つ ＋ そうび）':zoneOf(nf)[2]+'　まもの 3たい'))+'</div>';
+  h+='<div style="margin:10px 0">'+(nf>OPEN?'':subjTag(nf))+'</div>';
+  h+='<div class="sm">'+(nf>OPEN?'…かたい とびらが ある':(nb?'★ボスが まっている（たからばこ 2つ ＋ そうび）':zoneOf(nf)[2]+'　まもの 3たい'))+'</div>';
   h+='<div class="sm" style="margin-top:8px">♥ が ぜんかいした</div></div>';
   h+='<button class="btn" id="go">'+nf+'かいへ すすむ</button><button class="btn sub" id="bk">きょうは ここまで</button>';
   G.innerHTML=h;
@@ -409,6 +518,7 @@ function clearFloor(){
 
 window.addEventListener('resize',function(){if(cv&&D&&document.getElementById('cv')){sizeCanvas();render()}});
 screenTitle();
+
 })();
 </script>
 <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js")});navigator.serviceWorker.addEventListener("controllerchange",function(){if(!window.__rl){window.__rl=1;location.reload()}})}</script>
